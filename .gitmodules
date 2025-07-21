@@ -1,3 +1,0 @@
-[submodule "Modules/Refund"]
-	path = Modules/Refund
-	url = git@github.com:durrbar/refund-module.git

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Ecommerce\Http\Resources;
+namespace Modules\Refund\Http\Resources;
 
 use Illuminate\Http\Request;
 use Modules\Core\Http\Resources\Resource;
@@ -17,13 +17,13 @@ class RefundResource extends Resource
     {
 
         return [
-            'id'                  => $this->id,
-            'refund_reason'       => ['name'=>$this->refund_reason->name ?? null],
-            'amount'              => $this->amount,
-            'status'              => $this->status,
-            'customer'            => ['email' => $this->customer->email ?? null],
-            'order'               => $this->getOrderData($this->order),
-            'created_at'          => $this->created_at,
+            'id' => $this->id,
+            'refund_reason' => ['name' => $this->refund_reason->name ?? null],
+            'amount' => $this->amount,
+            'status' => $this->status,
+            'customer' => ['email' => $this->customer->email ?? null],
+            'order' => $this->getOrderData($this->order),
+            'created_at' => $this->created_at,
         ];
     }
 
@@ -32,7 +32,7 @@ class RefundResource extends Resource
         return [
             'id' => $data->id,
             'tracking_number' => $data->tracking_number,
-            'created_at'       => $this->created_at,
+            'created_at' => $this->created_at,
         ];
     }
 }

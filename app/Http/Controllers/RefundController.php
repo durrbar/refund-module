@@ -2,26 +2,24 @@
 
 namespace Modules\Refund\Http\Controllers;
 
-use App\Events\QuestionAnswered;
-use App\Events\RefundApproved;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Core\Exceptions\DurrbarException;
 use Modules\Core\Http\Controllers\CoreController;
-use Modules\Ecommerce\Models\Balance;
-use Modules\Order\Models\Order;
-use Modules\Ecommerce\Models\Wallet;
-use Modules\Refund\Repositories\RefundRepository;
-use Modules\Ecommerce\Enums\Permission;
-use Modules\Ecommerce\Exceptions\MarvelException;
-use Modules\Ecommerce\Http\Requests\RefundRequest;
 use Modules\Ecommerce\Http\Resources\GetSingleRefundResource;
-use Modules\Ecommerce\Http\Resources\RefundResource;
+use Modules\Ecommerce\Models\Wallet;
 use Modules\Ecommerce\Traits\WalletsTrait;
+use Modules\Order\Models\Order;
 use Modules\Refund\Enums\RefundStatus;
+use Modules\Refund\Http\Requests\RefundRequest;
+use Modules\Refund\Http\Resources\RefundResource;
+use Modules\Refund\Repositories\RefundRepository;
+use Modules\Role\Enums\Permission;
+use Modules\Vendor\Models\Balance;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RefundController extends CoreController
@@ -35,18 +33,17 @@ class RefundController extends CoreController
         $this->repository = $repository;
     }
 
-
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
      * @return Collection|Type[]
      */
     public function index(Request $request)
     {
         $limit = $request->limit;
-        $refunds =  $this->fetchRefunds($request)->paginate($limit);
+        $refunds = $this->fetchRefunds($request)->paginate($limit);
         $data = RefundResource::collection($refunds)->response()->getData(true);
+
         return formatAPIResourcePaginate($data);
     }
 
@@ -55,19 +52,20 @@ class RefundController extends CoreController
         try {
             $language = $request->language ?? DEFAULT_LANGUAGE;
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 throw new AuthorizationException(NOT_AUTHORIZED);
             }
 
-            $orderQuery = $this->repository->whereHas('order', function ($q) use ($language) {
+            $orderQuery = $this->repository->whereHas('order', function ($q) use ($language): void {
                 $q->where('language', $language);
             });
 
             switch ($user) {
                 case $user->hasPermissionTo(Permission::SUPER_ADMIN):
-                    if ((!isset($request->shop_id) || $request->shop_id === 'undefined')) {
+                    if ((! isset($request->shop_id) || $request->shop_id === 'undefined')) {
                         return $orderQuery->where('id', '!=', null)->where('shop_id', '=', null);
                     }
+
                     return $orderQuery->where('shop_id', '=', $request->shop_id);
                     break;
 
@@ -83,60 +81,61 @@ class RefundController extends CoreController
                     return $orderQuery->where('customer_id', $user->id)->where('shop_id', null);
                     break;
             }
-        } catch (MarvelException $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG);
         }
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param RefundRequest $request
      * @return mixed
+     *
      * @throws ValidatorException
      */
     public function store(RefundRequest $request)
     {
         try {
-            if (!$request->user()) {
+            if (! $request->user()) {
                 throw new AuthorizationException(NOT_AUTHORIZED);
             }
+
             return $this->repository->storeRefund($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(COULD_NOT_CREATE_THE_RESOURCE);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(COULD_NOT_CREATE_THE_RESOURCE);
         }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param $id
      * @return JsonResponse
      */
     public function show($id)
     {
         try {
-            $refund = $this->repository->with(['shop', 'order', 'customer', 'refund_policy','refund_reason'])->findOrFail($id);
+            $refund = $this->repository->with(['shop', 'order', 'customer', 'refund_policy', 'refund_reason'])->findOrFail($id);
+
             return new GetSingleRefundResource($refund);
-        } catch (MarvelException $e) {
-            throw new MarvelException(NOT_FOUND);
+        } catch (DurrbarException $e) {
+            throw new DurrbarException(NOT_FOUND);
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request  $request
-     * @param int $id
+     * @param  int  $id
      * @return JsonResponse
      */
     public function update(Request $request, $id)
     {
         try {
             $request->merge(['id' => $id]);
+
             return $this->updateRefund($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(COULD_NOT_UPDATE_THE_RESOURCE);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(COULD_NOT_UPDATE_THE_RESOURCE);
         }
     }
 
@@ -159,8 +158,8 @@ class RefundController extends CoreController
                     $order = Order::findOrFail($refund->order_id);
                     foreach ($order->children as $childOrder) {
                         $balance = Balance::where('shop_id', $childOrder->shop_id)->first();
-                        $balance->total_earnings = $balance->total_earnings - $childOrder->amount;
-                        $balance->current_balance = $balance->current_balance - $childOrder->amount;
+                        $balance->total_earnings -= $childOrder->amount;
+                        $balance->current_balance -= $childOrder->amount;
                         $balance->save();
                     }
                 } catch (Exception $e) {
@@ -168,12 +167,13 @@ class RefundController extends CoreController
                 }
                 $wallet = Wallet::firstOrCreate(['customer_id' => $refund->customer_id]);
                 $walletPoints = $this->currencyToWalletPoints($refund->amount);
-                $wallet->total_points = $wallet->total_points + $walletPoints;
-                $wallet->available_points = $wallet->available_points + $walletPoints;
+                $wallet->total_points += $walletPoints;
+                $wallet->available_points += $walletPoints;
                 $wallet->save();
 
                 // refund approved event
             }
+
             return $refund;
         } else {
             throw new AuthorizationException(NOT_AUTHORIZED);
@@ -183,16 +183,17 @@ class RefundController extends CoreController
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
+     * @param  int  $id
      * @return JsonResponse
      */
     public function destroy(Request $request, $id)
     {
         try {
             $request->merge(['id' => $id]);
+
             return $this->deleteRefund($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(COULD_NOT_DELETE_THE_RESOURCE);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(COULD_NOT_DELETE_THE_RESOURCE);
         }
     }
 
@@ -205,6 +206,7 @@ class RefundController extends CoreController
         }
         if ($this->repository->hasPermission($request->user())) {
             $refund->delete();
+
             return $refund;
         } else {
             throw new AuthorizationException(NOT_AUTHORIZED);

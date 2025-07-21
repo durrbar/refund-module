@@ -2,16 +2,15 @@
 
 namespace Modules\Refund\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Ecommerce\Traits\TranslationTrait;
 
 class RefundReason extends Model
 {
     use Sluggable;
     use TranslationTrait;
-
 
     protected $table = 'refund_reasons';
 
@@ -21,15 +20,13 @@ class RefundReason extends Model
 
     /**
      * Return the sluggable configuration array for this model.
-     *
-     * @return array
      */
     public function sluggable(): array
     {
         return [
             'slug' => [
-                'source' => 'name'
-            ]
+                'source' => 'name',
+            ],
         ];
     }
 

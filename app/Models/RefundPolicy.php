@@ -8,28 +8,30 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Ecommerce\Models\Shop;
 use Modules\Ecommerce\Traits\TranslationTrait;
+use Modules\Vendor\Models\Shop;
 
 class RefundPolicy extends Model
 {
-    use TranslationTrait, SoftDeletes, Sluggable;
+    use Sluggable;
+    use SoftDeletes;
+    use TranslationTrait;
+
     protected $table = 'refund_policies';
 
     public $guarded = [];
 
     protected $appends = ['translated_languages'];
+
     /**
      * Return the sluggable configuration array for this model.
-     *
-     * @return array
      */
     public function sluggable(): array
     {
         return [
             'slug' => [
                 'source' => 'title',
-            ]
+            ],
         ];
     }
 
@@ -38,9 +40,6 @@ class RefundPolicy extends Model
         return $query->where('language', $model->language);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function shop(): BelongsTo
     {
         return $this->belongsTo(Shop::class);
@@ -49,7 +48,6 @@ class RefundPolicy extends Model
     /**
      * @return BelongsTo
      */
-
     public function refunds(): HasMany
     {
         return $this->hasMany(Refund::class);

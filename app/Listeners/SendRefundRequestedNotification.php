@@ -2,22 +2,20 @@
 
 namespace Modules\Refund\Listeners;
 
-
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Modules\Ecommerce\Enums\EventType;
+use Modules\Notification\Enums\EventType;
+use Modules\Notification\Traits\OrderSmsTrait;
+use Modules\Notification\Traits\SmsTrait;
 use Modules\Refund\Events\RefundRequested;
-use Modules\Ecommerce\Traits\OrderSmsTrait;
-use Modules\Ecommerce\Traits\SmsTrait;
-
 
 class SendRefundRequestedNotification implements ShouldQueue
 {
-    use SmsTrait, OrderSmsTrait;
+    use OrderSmsTrait;
+    use SmsTrait;
 
     /**
      * Handle the event.
      *
-     * @param RefundRequested $event
      * @return void
      */
     public function handle(RefundRequested $event)

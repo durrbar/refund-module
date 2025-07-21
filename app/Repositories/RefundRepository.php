@@ -1,18 +1,16 @@
 <?php
 
-
 namespace Modules\Refund\Repositories;
 
 use Exception;
+use Modules\Core\Exceptions\DurrbarException;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\Ecommerce\Models\Address;
-use Modules\Order\Models\Order;
-use Modules\refund\Models\Refund;
 use Modules\Order\Enums\OrderStatus;
-use Modules\Ecommerce\Enums\PaymentStatus;
-use Modules\Ecommerce\Enums\Permission;
+use Modules\Order\Models\Order;
+use Modules\Payment\Enums\PaymentStatus;
 use Modules\Refund\Enums\RefundStatus;
-use Modules\Ecommerce\Exceptions\MarvelException;
+use Modules\refund\Models\Refund;
+use Modules\Role\Enums\Permission;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 
@@ -33,8 +31,9 @@ class RefundRepository extends BaseRepository
         'title',
         'description',
         'refund_policy_id',
-        'refund_reason_id'
+        'refund_reason_id',
     ];
+
     /**
      * Configure the Model
      **/
@@ -56,31 +55,32 @@ class RefundRepository extends BaseRepository
         $user = $request->user();
         $refunds = $this->where('order_id', $request->order_id)->get();
         if (count($refunds)) {
-            throw new MarvelException(ORDER_ALREADY_HAS_REFUND_REQUEST);
+            throw new DurrbarException(ORDER_ALREADY_HAS_REFUND_REQUEST);
         }
         try {
             $order = Order::findOrFail($request->order_id);
             if ($order->parent !== null) {
-                throw new MarvelException(REFUND_ONLY_ALLOWED_FOR_MAIN_ORDER);
+                throw new DurrbarException(REFUND_ONLY_ALLOWED_FOR_MAIN_ORDER);
             }
         } catch (Exception $th) {
-            throw new MarvelException(NOT_FOUND);
+            throw new DurrbarException(NOT_FOUND);
         }
         if ($user->id !== $order->customer_id || $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
-            throw new MarvelException(NOT_AUTHORIZED);
+            throw new DurrbarException(NOT_AUTHORIZED);
         }
         $data = $request->only($this->dataArray);
         $data['customer_id'] = $order->customer_id;
         $data['amount'] = $order->amount;
         $refund = $this->create($data);
         $this->createChildOrderRefund($order->children, $data);
+
         return $this->find($refund->id);
     }
 
     public function createChildOrderRefund($orders, $data)
     {
         try {
-            foreach ($orders as  $order) {
+            foreach ($orders as $order) {
                 $data['order_id'] = $order->id;
                 $data['customer_id'] = $order->customer_id;
                 $data['shop_id'] = $order->shop_id;
@@ -88,14 +88,14 @@ class RefundRepository extends BaseRepository
                 $this->create($data);
             }
         } catch (Exception $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG);
+            throw new DurrbarException(SOMETHING_WENT_WRONG);
         }
     }
 
     public function updateRefund($request, $refund)
     {
-        if ($refund->shop_id !==  null) {
-            throw new MarvelException(WRONG_REFUND);
+        if ($refund->shop_id !== null) {
+            throw new DurrbarException(WRONG_REFUND);
         }
         $data = $request->only(['status']);
         $refund->update($data);
@@ -106,6 +106,7 @@ class RefundRepository extends BaseRepository
             $orderData['payment_status'] = PaymentStatus::REFUNDED;
             $this->changeOrderStatus($refund->order_id, $orderData);
         }
+
         return $refund;
     }
 
@@ -117,7 +118,7 @@ class RefundRepository extends BaseRepository
             return $childOrder['id'];
         }, $order->children->toArray());
 
-        $this->whereIn('order_id',  $childOrderIds)->update($data);
+        $this->whereIn('order_id', $childOrderIds)->update($data);
     }
 
     private function changeOrderStatus($parentOrderId, array $data)

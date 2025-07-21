@@ -4,8 +4,11 @@ namespace Modules\Refund\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Order\Models\Order;
 use Modules\Refund\Events\RefundRequested;
 use Modules\Refund\Events\RefundUpdate;
+use Modules\User\Models\User;
+use Modules\Vendor\Facades\Shop;
 
 class Refund extends Model
 {
@@ -14,7 +17,7 @@ class Refund extends Model
     public $guarded = [];
 
     protected $casts = [
-        'images'   => 'json',
+        'images' => 'json',
     ];
 
     protected $dispatchesEvents = [
@@ -22,37 +25,26 @@ class Refund extends Model
         'updated' => RefundUpdate::class,
     ];
 
-    /**
-     * @return BelongsTo
-     */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'customer_id');
     }
-    /**
-     * @return BelongsTo
-     */
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
-    /**
-     * @return BelongsTo
-     */
+
     public function shop(): BelongsTo
     {
         return $this->belongsTo(Shop::class, 'shop_id');
     }
-    /**
-     * @return BelongsTo
-     */
+
     public function refund_policy(): BelongsTo
     {
         return $this->belongsTo(RefundPolicy::class, 'refund_policy_id');
     }
-    /**
-     * @return BelongsTo
-     */
+
     public function refund_reason(): BelongsTo
     {
         return $this->belongsTo(RefundReason::class, 'refund_reason_id');

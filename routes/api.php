@@ -14,6 +14,6 @@ use Modules\Refund\Http\Controllers\RefundController;
  *
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+Route::middleware(['auth:sanctum'])->prefix('v1')->group(function (): void {
     Route::apiResource('refund', RefundController::class)->names('refund');
 });

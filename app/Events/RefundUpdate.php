@@ -9,13 +9,14 @@ use Modules\Refund\Models\Refund;
 
 class RefundUpdate
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public Refund $refund;
+
     /**
      * Create a new event instance.
-     *
-     * @param Refund $refund
      */
     public function __construct(Refund $refund)
     {

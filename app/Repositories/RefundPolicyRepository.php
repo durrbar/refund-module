@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Modules\Refund\Repositories;
 
 use Illuminate\Http\Request;
@@ -11,8 +10,6 @@ use Prettus\Repository\Exceptions\RepositoryException;
 
 class RefundPolicyRepository extends BaseRepository
 {
-
-
     protected $fieldSearchable = [
         'title' => 'like',
         'slug' => 'like',
@@ -32,6 +29,7 @@ class RefundPolicyRepository extends BaseRepository
         'shop_id',
         'language',
     ];
+
     /**
      * Configure the Model
      **/
@@ -53,6 +51,7 @@ class RefundPolicyRepository extends BaseRepository
         $data = $request->only($this->dataArray);
         $data['slug'] = $this->makeSlug($request);
         $refundPolicy = $this->create($data);
+
         return $refundPolicy;
     }
 
@@ -61,14 +60,15 @@ class RefundPolicyRepository extends BaseRepository
         $data = $request->only($this->dataArray);
         $data['slug'] = $this->makeSlug(request: $request, update: $refundPolicy->id);
         $refundPolicy->update($data);
+
         return $refundPolicy;
     }
 
-    public function findRefundPolicy(int | string $value, string $language = DEFAULT_LANGUAGE): RefundPolicy
+    public function findRefundPolicy(int|string $value, string $language = DEFAULT_LANGUAGE): RefundPolicy
     {
         return match (true) {
             is_numeric($value) => $this->where('id', $value)->where('language', $language)->firstOrFail(),
-            is_string($value)  => $this->where('slug', $value)->where('language', $language)->firstOrFail(),
+            is_string($value) => $this->where('slug', $value)->where('language', $language)->firstOrFail(),
         };
     }
 }

@@ -1,13 +1,12 @@
 <?php
 
-
 namespace Modules\Refund\Repositories;
 
+use Illuminate\Http\Request;
+use Modules\Core\Repositories\BaseRepository;
 use Modules\Refund\Models\RefundReason;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
-use Illuminate\Http\Request;
-use Modules\Core\Repositories\BaseRepository;
 
 class RefundReasonRepository extends BaseRepository
 {
@@ -15,7 +14,7 @@ class RefundReasonRepository extends BaseRepository
      * @var array
      */
     protected $fieldSearchable = [
-        'name'        => 'like',
+        'name' => 'like',
     ];
 
     protected $dataArray = [
@@ -33,7 +32,6 @@ class RefundReasonRepository extends BaseRepository
         }
     }
 
-
     /**
      * Configure the Model
      **/
@@ -47,16 +45,18 @@ class RefundReasonRepository extends BaseRepository
         $data = $request->only($this->dataArray);
         $data['slug'] = $this->makeSlug($request);
         $refundReason = $this->create($data);
+
         return $refundReason;
     }
 
     public function updateRefundReason($request, $item)
     {
         $data = $request->only($this->dataArray);
-        if (!empty($request->slug) &&  $request->slug != $item['slug']) {
+        if (! empty($request->slug) && $request->slug != $item['slug']) {
             $data['slug'] = $this->makeSlug($request);
         }
         $item->update($data);
+
         return $this->findOrFail($item->id);
     }
 }
