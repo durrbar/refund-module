@@ -9,7 +9,7 @@ use Modules\Order\Enums\OrderStatus;
 use Modules\Order\Models\Order;
 use Modules\Payment\Enums\PaymentStatus;
 use Modules\Refund\Enums\RefundStatus;
-use Modules\refund\Models\Refund;
+use Modules\Refund\Models\Refund;
 use Modules\Role\Enums\Permission;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
