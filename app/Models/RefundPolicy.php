@@ -4,6 +4,7 @@ namespace Modules\Refund\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +14,7 @@ use Modules\Vendor\Models\Shop;
 
 class RefundPolicy extends Model
 {
+    use HasUuids;
     use Sluggable;
     use SoftDeletes;
     use TranslationTrait;

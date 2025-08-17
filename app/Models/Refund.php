@@ -2,6 +2,7 @@
 
 namespace Modules\Refund\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Order\Models\Order;
@@ -12,6 +13,8 @@ use Modules\Vendor\Facades\Shop;
 
 class Refund extends Model
 {
+    use HasUuids;
+    
     protected $table = 'refunds';
 
     public $guarded = [];
