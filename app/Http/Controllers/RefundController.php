@@ -58,7 +58,7 @@ class RefundController extends CoreController
 
             $orderQuery = $this->repository->whereHas('order', function ($q) use ($language): void {
                 $q->where('language', $language);
-            });
+            })->with(['refund_reason', 'customer', 'order']);
 
             switch ($user) {
                 case $user->hasPermissionTo(Permission::SUPER_ADMIN):
@@ -114,7 +114,7 @@ class RefundController extends CoreController
     public function show($id)
     {
         try {
-            $refund = $this->repository->with(['shop', 'order', 'customer', 'refund_policy', 'refund_reason'])->findOrFail($id);
+            $refund = $this->repository->with(['shop', 'order.products', 'customer', 'refund_policy', 'refund_reason'])->findOrFail($id);
 
             return new GetSingleRefundResource($refund);
         } catch (DurrbarException $e) {
