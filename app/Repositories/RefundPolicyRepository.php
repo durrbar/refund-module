@@ -35,12 +35,12 @@ class RefundPolicyRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return RefundPolicy::class;
     }
 
-    public function boot()
+    public function boot(): void
     {
         try {
             $this->pushCriteria(app(RequestCriteria::class));
