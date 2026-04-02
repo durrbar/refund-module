@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Http\Controllers;
 
 use Exception;
@@ -22,7 +24,7 @@ use Modules\Role\Enums\Permission;
 use Modules\Vendor\Models\Balance;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class RefundController extends CoreController
+final class RefundController extends CoreController
 {
     use WalletsTrait;
 
@@ -61,7 +63,7 @@ class RefundController extends CoreController
             })->with(['refund_reason', 'customer', 'order']);
 
             switch ($user) {
-                case $user->hasPermissionTo(Permission::SUPER_ADMIN):
+                case $user->hasPermissionTo(Permission::SuperAdmin->value):
                     if ((! isset($request->shop_id) || $request->shop_id === 'undefined')) {
                         return $orderQuery->where('id', '!=', null)->where('shop_id', '=', null);
                     }
@@ -73,7 +75,7 @@ class RefundController extends CoreController
                     return $orderQuery->where('shop_id', '=', $request->shop_id);
                     break;
 
-                case $user->hasPermissionTo(Permission::CUSTOMER):
+                case $user->hasPermissionTo(Permission::Customer->value):
                     return $orderQuery->where('customer_id', $user->id)->where('shop_id', null);
                     break;
 
@@ -146,14 +148,14 @@ class RefundController extends CoreController
         if ($this->repository->hasPermission($user)) {
             try {
                 $refund = $this->repository->with(['shop', 'order', 'customer'])->findOrFail($request->id);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 throw new ModelNotFoundException(NOT_FOUND);
             }
-            if ($refund->status == RefundStatus::APPROVED) {
+            if ($refund->status === RefundStatus::Approved->value) {
                 throw new HttpException(400, ALREADY_REFUNDED);
             }
             $this->repository->updateRefund($request, $refund);
-            if ($request->status == RefundStatus::APPROVED) {
+            if ($request->status === RefundStatus::Approved->value) {
                 try {
                     $order = Order::findOrFail($refund->order_id);
                     foreach ($order->children as $childOrder) {
@@ -175,9 +177,8 @@ class RefundController extends CoreController
             }
 
             return $refund;
-        } else {
-            throw new AuthorizationException(NOT_AUTHORIZED);
         }
+        throw new AuthorizationException(NOT_AUTHORIZED);
     }
 
     /**
@@ -201,15 +202,14 @@ class RefundController extends CoreController
     {
         try {
             $refund = $this->repository->findOrFail($request->id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ModelNotFoundException(NOT_FOUND);
         }
         if ($this->repository->hasPermission($request->user())) {
             $refund->delete();
 
             return $refund;
-        } else {
-            throw new AuthorizationException(NOT_AUTHORIZED);
         }
+        throw new AuthorizationException(NOT_AUTHORIZED);
     }
 }

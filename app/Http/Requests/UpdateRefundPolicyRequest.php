@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 use Modules\Refund\Enums\RefundPolicyStatus;
 use Modules\Refund\Enums\RefundPolicyTarget;
 use Modules\Vendor\Models\Shop;
 
-class UpdateRefundPolicyRequest extends FormRequest
+final class UpdateRefundPolicyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,8 +33,8 @@ class UpdateRefundPolicyRequest extends FormRequest
     {
         return [
             'title' => ['string', 'string', 'max  : 255'],
-            'target' => ['string', 'max:255', Rule::in(RefundPolicyTarget::getValues())],
-            'status' => ['string', 'max:255', Rule::in(RefundPolicyStatus::getValues())],
+            'target' => ['string', 'max:255', new Enum(RefundPolicyTarget::class)],
+            'status' => ['string', 'max:255', new Enum(RefundPolicyStatus::class)],
             'slug' => ['nullable', 'string', 'max: 255'],
             'description' => ['nullable', 'string', 'max:10000'],
             'shop_id' => ['nullable', 'exists:'.Shop::class.',id'],

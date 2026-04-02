@@ -1,15 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Enums;
 
-use BenSampo\Enum\Enum;
-
-/**
- * Class RoleType
- */
-final class RefundPolicyStatus extends Enum
+enum RefundPolicyStatus: string
 {
-    public const APPROVED = 'approved';
-
-    public const PENDING = 'pending';
+    case Approved = 'approved';
+    case Pending = 'pending';
 }

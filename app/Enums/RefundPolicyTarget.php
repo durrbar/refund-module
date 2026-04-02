@@ -1,15 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Enums;
 
-use BenSampo\Enum\Enum;
-
-/**
- * Class RoleType
- */
-final class RefundPolicyTarget extends Enum
+enum RefundPolicyTarget: string
 {
-    public const VENDOR = 'vendor';
-
-    public const CUSTOMER = 'customer';
+    case Vendor = 'vendor';
+    case Customer = 'customer';
 }

@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Modules\Refund\Enums\RefundPolicyStatus;
 use Modules\Refund\Enums\RefundPolicyTarget;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -17,9 +20,9 @@ return new class () extends Migration {
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->enum('target', RefundPolicyTarget::getValues())->default(RefundPolicyTarget::VENDOR);
+            $table->enum('target', RefundPolicyTarget::cases())->default(RefundPolicyTarget::Vendor->value);
             $table->string('language')->default(DEFAULT_LANGUAGE);
-            $table->enum('status', RefundPolicyStatus::getValues())->default(RefundPolicyStatus::PENDING);
+            $table->enum('status', RefundPolicyStatus::cases())->default(RefundPolicyStatus::Pending->value);
             $table->foreignUuid('shop_id')->nullable()->constrained('shops')->onDelete('set null');
             $table->timestamps();
             $table->softDeletes();

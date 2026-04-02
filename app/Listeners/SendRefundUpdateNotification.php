@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -8,7 +10,7 @@ use Modules\Notification\Traits\OrderSmsTrait;
 use Modules\Notification\Traits\SmsTrait;
 use Modules\Refund\Events\RefundUpdate;
 
-class SendRefundUpdateNotification implements ShouldQueue
+final class SendRefundUpdateNotification implements ShouldQueue
 {
     use OrderSmsTrait;
     use SmsTrait;
@@ -25,7 +27,7 @@ class SendRefundUpdateNotification implements ShouldQueue
         if ($order->parent_id) {
             return;
         }
-        $emailReceiver = $this->getWhichUserWillGetEmail(EventType::ORDER_REFUND, $event->refund->order->language);
+        $emailReceiver = $this->getWhichUserWillGetEmail(EventType::OrderRefund->value, $event->refund->order->language);
 
         if ($emailReceiver['customer'] && $refund->customer()) {
             $refund->customer->notify(new RefundUpdate($refund, 'customer'));

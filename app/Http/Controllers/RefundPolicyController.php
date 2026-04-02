@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Http\Controllers;
 
 use Exception;
@@ -16,11 +18,9 @@ use Modules\Refund\Http\Resources\RefundPolicyResource;
 use Modules\Refund\Repositories\RefundPolicyRepository;
 use Modules\Role\Enums\Permission;
 
-class RefundPolicyController extends CoreController
+final class RefundPolicyController extends CoreController
 {
-    public function __construct(private readonly RefundPolicyRepository $repository)
-    {
-    }
+    public function __construct(private readonly RefundPolicyRepository $repository) {}
 
     /**
      * Display a listing of the resource.
@@ -146,7 +146,7 @@ class RefundPolicyController extends CoreController
     {
         $slug = $request->id ?? $request->slug;
         $language = $request->language ?? DEFAULT_LANGUAGE;
-        if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+        if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
             $refundPolicy = $this->repository->findRefundPolicy($slug, $language);
             $refundPolicy->delete();
 

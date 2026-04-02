@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -8,7 +10,7 @@ use Modules\Notification\Traits\OrderSmsTrait;
 use Modules\Notification\Traits\SmsTrait;
 use Modules\Refund\Events\RefundRequested;
 
-class SendRefundRequestedNotification implements ShouldQueue
+final class SendRefundRequestedNotification implements ShouldQueue
 {
     use OrderSmsTrait;
     use SmsTrait;
@@ -23,7 +25,7 @@ class SendRefundRequestedNotification implements ShouldQueue
         $refund = $event->refund;
         $customer = $refund->customer;
         $order = $refund->order;
-        $emailReceiver = $this->getWhichUserWillGetEmail(EventType::ORDER_REFUND, $order->language);
+        $emailReceiver = $this->getWhichUserWillGetEmail(EventType::OrderRefund->value, $order->language);
         if ($emailReceiver['admin']) {
             $admins = $this->adminList();
             foreach ($admins as $admin) {

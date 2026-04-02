@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Repositories;
 
 use Exception;
@@ -14,7 +16,7 @@ use Modules\Role\Enums\Permission;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 
-class RefundRepository extends BaseRepository
+final class RefundRepository extends BaseRepository
 {
     protected $fieldSearchable = [
         'title',
@@ -65,7 +67,7 @@ class RefundRepository extends BaseRepository
         } catch (Exception $th) {
             throw new DurrbarException(NOT_FOUND);
         }
-        if ($user->id !== $order->customer_id || $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
+        if ($user->id !== $order->customer_id || $user->hasPermissionTo(Permission::SuperAdmin->value)) {
             throw new DurrbarException(NOT_AUTHORIZED);
         }
         $data = $request->only($this->dataArray);
@@ -101,9 +103,9 @@ class RefundRepository extends BaseRepository
         $refund->update($data);
         $this->changeShopSpecificRefundStatus($refund->order_id, $data);
 
-        if ($refund['status'] == RefundStatus::APPROVED) {
-            $orderData['order_status'] = OrderStatus::REFUNDED;
-            $orderData['payment_status'] = PaymentStatus::REFUNDED;
+        if ($refund['status'] === RefundStatus::Approved->value) {
+            $orderData['order_status'] = OrderStatus::Refunded->value;
+            $orderData['payment_status'] = PaymentStatus::Refunded->value;
             $this->changeOrderStatus($refund->order_id, $orderData);
         }
 

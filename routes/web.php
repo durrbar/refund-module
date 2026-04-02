@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 use Modules\Refund\Http\Controllers\RefundController;
 use Modules\Refund\Http\Controllers\RefundPolicyController;
@@ -34,7 +36,7 @@ Route::resource('refund-policies', RefundPolicyController::class, [
  * Authorized Route for Super Admin only
  * *****************************************
  */
-Route::group(['middleware' => ['permission:'.Permission::SUPER_ADMIN, 'auth:sanctum']], function (): void {
+Route::group(['middleware' => ['permission:'.Permission::SuperAdmin->value, 'auth:sanctum']], function (): void {
 
     Route::apiResource('refund-reasons', RefundReasonController::class, [
         'only' => ['store', 'update', 'destroy'],
@@ -57,7 +59,7 @@ Route::group(['middleware' => ['permission:'.Permission::SUPER_ADMIN, 'auth:sanc
  * Authorized Route for Customers only
  * ******************************************
  */
-Route::group(['middleware' => ['can:'.Permission::CUSTOMER, 'auth:sanctum', 'email.verified']], function (): void {
+Route::group(['middleware' => ['can:'.Permission::Customer->value, 'auth:sanctum', 'email.verified']], function (): void {
     Route::apiResource(
         'refunds',
         RefundController::class,

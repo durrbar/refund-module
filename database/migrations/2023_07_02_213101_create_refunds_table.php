@@ -17,7 +17,7 @@ return new class() extends Migration
         Schema::create('refunds', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->double('amount')->default(0);
-            $table->enum('status', RefundStatus::getValues())->default(RefundStatus::PENDING);
+            $table->enum('status', RefundStatus::cases())->default(RefundStatus::Pending->value);
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->json('images')->nullable();
