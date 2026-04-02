@@ -24,7 +24,7 @@ use Modules\Role\Enums\Permission;
 use Modules\Vendor\Models\Balance;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-final class RefundController extends CoreController
+class RefundController extends CoreController
 {
     use WalletsTrait;
 

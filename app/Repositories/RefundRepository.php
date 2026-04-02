@@ -16,7 +16,7 @@ use Modules\Role\Enums\Permission;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 
-final class RefundRepository extends BaseRepository
+class RefundRepository extends BaseRepository
 {
     protected $fieldSearchable = [
         'title',

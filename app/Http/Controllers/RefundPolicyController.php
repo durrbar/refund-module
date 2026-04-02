@@ -18,7 +18,7 @@ use Modules\Refund\Http\Resources\RefundPolicyResource;
 use Modules\Refund\Repositories\RefundPolicyRepository;
 use Modules\Role\Enums\Permission;
 
-final class RefundPolicyController extends CoreController
+class RefundPolicyController extends CoreController
 {
     public function __construct(private readonly RefundPolicyRepository $repository) {}
 

@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,17 +15,11 @@ use Modules\Refund\Events\RefundUpdate;
 use Modules\User\Models\User;
 use Modules\Vendor\Facades\Shop;
 
+#[Table('refunds')]
+#[Unguarded]
 class Refund extends Model
 {
     use HasUuids;
-    
-    protected $table = 'refunds';
-
-    public $guarded = [];
-
-    protected $casts = [
-        'images' => 'json',
-    ];
 
     protected $dispatchesEvents = [
         'created' => RefundRequested::class,
@@ -51,5 +49,12 @@ class Refund extends Model
     public function refund_reason(): BelongsTo
     {
         return $this->belongsTo(RefundReason::class, 'refund_reason_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'images' => 'json',
+        ];
     }
 }

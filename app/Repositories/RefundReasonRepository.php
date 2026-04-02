@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Repositories;
 
 use Illuminate\Http\Request;
@@ -52,7 +54,7 @@ class RefundReasonRepository extends BaseRepository
     public function updateRefundReason($request, $item)
     {
         $data = $request->only($this->dataArray);
-        if (! empty($request->slug) && $request->slug != $item['slug']) {
+        if (! empty($request->slug) && $request->slug !== $item['slug']) {
             $data['slug'] = $this->makeSlug($request);
         }
         $item->update($data);

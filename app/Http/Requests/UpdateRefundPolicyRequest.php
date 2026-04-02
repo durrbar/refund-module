@@ -12,7 +12,7 @@ use Modules\Refund\Enums\RefundPolicyStatus;
 use Modules\Refund\Enums\RefundPolicyTarget;
 use Modules\Vendor\Models\Shop;
 
-final class UpdateRefundPolicyRequest extends FormRequest
+class UpdateRefundPolicyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

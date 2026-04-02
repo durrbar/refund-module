@@ -10,7 +10,7 @@ use Modules\Notification\Traits\OrderSmsTrait;
 use Modules\Notification\Traits\SmsTrait;
 use Modules\Refund\Events\RefundRequested;
 
-final class SendRefundRequestedNotification implements ShouldQueue
+class SendRefundRequestedNotification implements ShouldQueue
 {
     use OrderSmsTrait;
     use SmsTrait;

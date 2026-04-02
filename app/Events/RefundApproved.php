@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Refund\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -12,6 +14,7 @@ class RefundApproved
     use Dispatchable;
     use InteractsWithSockets;
     use SerializesModels;
+
     public $refund;
 
     /**
