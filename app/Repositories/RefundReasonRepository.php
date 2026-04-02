@@ -25,7 +25,7 @@ class RefundReasonRepository extends BaseRepository
         'language',
     ];
 
-    public function boot()
+    public function boot(): void
     {
         try {
             $this->pushCriteria(app(RequestCriteria::class));
@@ -37,12 +37,12 @@ class RefundReasonRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return RefundReason::class;
     }
 
-    public function storeRefundReason(Request $request)
+    public function storeRefundReason(Request $request): RefundReason
     {
         $data = $request->only($this->dataArray);
         $data['slug'] = $this->makeSlug($request);
@@ -51,7 +51,7 @@ class RefundReasonRepository extends BaseRepository
         return $refundReason;
     }
 
-    public function updateRefundReason($request, $item)
+    public function updateRefundReason(Request $request, RefundReason $item): RefundReason
     {
         $data = $request->only($this->dataArray);
         if (! empty($request->slug) && $request->slug !== $item['slug']) {
