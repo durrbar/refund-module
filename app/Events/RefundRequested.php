@@ -18,5 +18,5 @@ class RefundRequested
     /**
      * Create a new event instance.
      */
-    public function __construct(public Refund $refund) {}
+    public function __construct(public readonly Refund $refund) {}
 }
