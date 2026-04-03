@@ -18,9 +18,8 @@ class SendRefundUpdateNotification implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @return void
      */
-    public function handle(RefundUpdate $event)
+    public function handle(RefundUpdate $event): void
     {
         $refund = $event->refund;
         $order = $refund->order;
