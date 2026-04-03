@@ -39,7 +39,7 @@ class StoreRefundPolicyRequest extends FormRequest
         ];
     }
 
-    public function failedValidation(Validator ): void
+    public function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json($validator->errors(), 422));
     }
