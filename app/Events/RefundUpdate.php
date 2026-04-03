@@ -15,13 +15,8 @@ class RefundUpdate
     use InteractsWithSockets;
     use SerializesModels;
 
-    public Refund $refund;
-
     /**
      * Create a new event instance.
      */
-    public function __construct(Refund $refund)
-    {
-        $this->refund = $refund;
-    }
+    public function __construct(public Refund $refund) {}
 }
