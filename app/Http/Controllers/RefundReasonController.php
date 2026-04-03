@@ -17,12 +17,7 @@ use Prettus\Validator\Exceptions\ValidatorException;
 
 class RefundReasonController extends CoreController
 {
-    public $repository;
-
-    public function __construct(RefundReasonRepository $repository)
-    {
-        $this->repository = $repository;
-    }
+    public function __construct(public RefundReasonRepository $repository) {}
 
     /**
      * Display a listing of the resource.
